@@ -41,27 +41,29 @@ function createEarthquakeLayer(earthquakeData) {
   return earthquakes;
 }
 
-function createFaultLayer(faultData){
+  // Create Empty layer for fault lines
   let faultLineLayer = new L.LayerGroup(); 
-  // Create layer for fault line geoJson
+
+  // Create link to get the fault line geoJson
   let link = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
- 
-// Our style object
-let faultStyle = {
-  color: "orange",
-  weight: 2.5
-};
+  
+  // Our style object for the lines in the geojson data
+  let faultStyle = {
+    color: "orange",
+    weight: 3
+  };
 
-// Grabbing our GeoJSON data..
-d3.json(link, function(data) {
-  // Creating a geoJSON layer with the retrieved data
-  L.geoJson(data, {
-    // Passing in our style object
-    style: faultStyle
-  }).addTo(faultLineLayer);
-});
+  // Grabbing our GeoJSON data..
+  d3.json(link, function(data) {
+    // Creating a geoJSON layer with the retrieved data
+    console.log(data);
+    L.geoJson(data, {
+      // Passing in our style object
+      style: faultStyle
+    }).addTo(faultLineLayer);
+  });
 
-}
+
 
 function createMap(earthquakes) {
   // Define streetmap, satellite, light and darkmap layers
