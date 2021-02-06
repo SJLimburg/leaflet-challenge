@@ -1,17 +1,7 @@
-// Store our API endpoint as queryUrl for date specific
+// Store our API endpoint as queryUrl for previouis 7 days
 const queryUrl =
 "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
-// ++++++Othere data sets for my edification
-// One month data
-  // "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2020-01-01&endtime=" +
-  // "2020-01-30&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
-// last hour data
-// "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
-//  limit the magnitude
-// "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2014-01-01&endtime=2014-01-02&minmagnitude=5."
 
-  // console.log(queryUrl);
-/***************************************/
 //all the earthquake api
 d3.json(queryUrl).then(createEarthquakeMap);
 /***************************************/
@@ -21,19 +11,9 @@ function createEarthquakeMap(data) {
 }
 /***************************************/
 function createEarthquakeLayer(earthquakeData) {
-  // var earthquakes = L.geoJSON(earthquakeData);
-  // earthquakes.bindPopup((layer) => {
-  //   return (
-  //     "<h3> " +
-  //     layer.feature.properties.place +
-  //     "</h3><hr><p>" +
-  //     new Date(layer.feature.properties.time) +
-  //     "</p>"
-  //   );
-  // });
-  // set up layer properties - for the property call the function listed
-  // ==========create style function for onStyle and filter function for onFilter
-  
+
+  // ==========created style function for onStyle and did not use the filter function for onFilter 
+  //  the earthquake dat ais a set of point features
   let earthquakes = L.geoJSON(earthquakeData, {
     onEachFeature: onEachFeature,
     pointToLayer: pointToLayer,
@@ -60,6 +40,29 @@ function createEarthquakeLayer(earthquakeData) {
   }
   return earthquakes;
 }
+
+function createFaultLayer(faultData){
+  let faultLineLayer = new L.LayerGroup(); 
+  // Create layer for fault line geoJson
+  let link = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
+ 
+// Our style object
+let faultStyle = {
+  color: "orange",
+  weight: 2.5
+};
+
+// Grabbing our GeoJSON data..
+d3.json(link, function(data) {
+  // Creating a geoJSON layer with the retrieved data
+  L.geoJson(data, {
+    // Passing in our style object
+    style: faultStyle
+  }).addTo(faultLineLayer);
+});
+
+}
+
 function createMap(earthquakes) {
   // Define streetmap, satellite, light and darkmap layers
   let streetmap = L.tileLayer(
@@ -113,16 +116,19 @@ function createMap(earthquakes) {
     "Dark Map": darkmap,
     "Light Map": lightmap,
   };
+  
   // Create overlay object to hold our overlay layer
   // +++++++++++++++++++++++++++++ will need to add tectonic plates -- data can be found at https://github.com/fraxen/tectonicplates
   let overlayMaps = {
     Earthquakes: earthquakes,
+    FaultLines : faultLineLayer
   };
+
   // Create our map, giving it the streetmap and earthquakes layers to display on load
   let myMap = L.map("map", {
     center: [37.09, -95.71],
     zoom: 5,
-    layers: [satellite, earthquakes],
+    layers: [satellite, earthquakes, faultLineLayer],
   });
   // Create a layer control
   // Pass in our baseMaps and overlayMaps
@@ -132,6 +138,8 @@ function createMap(earthquakes) {
       collapsed: false,
     }).addTo(myMap);
 
+
+  // Add legend to map using leaflet documentation
     let legend = L.control({position: 'bottomleft'});
 
     legend.onAdd = function (map) {
@@ -153,7 +161,7 @@ function createMap(earthquakes) {
     legend.addTo(myMap);
 }
 
-// Set the color palatte for the circle markers
+// Set the color palatte for the circle markers per Leaflet documentation
 function getColor(d){
   return  d > 6 ? '#cc0099' :
           d > 5 ? '#ff0000' :
@@ -168,11 +176,15 @@ function onStyle(feature) {
   let mag = feature.properties.mag; 
   let selColor = getColor(mag)
 
-  return {radius: feature.properties.mag*2,
+  return {radius: feature.properties.mag*2.  ,
     color: "#000",
     fillColor: selColor,
     fillOpacity: 0.9,
     weight: 1,
     opacity: 0.2}
 }
+
+
+
+
 
