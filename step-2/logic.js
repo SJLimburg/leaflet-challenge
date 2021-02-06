@@ -41,29 +41,6 @@ function createEarthquakeLayer(earthquakeData) {
   return earthquakes;
 }
 
-  // Create Empty layer for fault lines
-  let faultLineLayer = new L.LayerGroup(); 
-
-  // Create link to get the fault line geoJson
-  let link = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
-  
-  // Our style object for the lines in the geojson data
-  let faultStyle = {
-    color: "orange",
-    weight: 3
-  };
-
-  // Grabbing our GeoJSON data..
-  d3.json(link, function(data) {
-    // Creating a geoJSON layer with the retrieved data
-    console.log(data);
-    L.geoJson(data, {
-      // Passing in our style object
-      style: faultStyle
-    }).addTo(faultLineLayer);
-  });
-
-
 
 function createMap(earthquakes) {
   // Define streetmap, satellite, light and darkmap layers
@@ -118,6 +95,30 @@ function createMap(earthquakes) {
     "Dark Map": darkmap,
     "Light Map": lightmap,
   };
+
+//+++++++++++++++Fault lines++++++++++++++++++
+  // Create Empty layer for fault lines - techtonic plates
+  let faultLineLayer = new L.LayerGroup(); 
+
+  // Create link to get the fault line geoJson
+  let link = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
+  
+  // Our style object for the lines in the geojson data
+  let faultStyle = {
+    color: "orange",
+    weight: 3.0,
+  };
+
+  // Grabbing our GeoJSON data..
+  d3.json(link).then(data => {
+    // console.log(data);
+    L.geoJson(data, {
+    // Passing in our style object
+          style: faultStyle
+        }).addTo(faultLineLayer);
+        faultLineLayer.addTo(myMap);
+  })
+  
   
   // Create overlay object to hold our overlay layer
   // +++++++++++++++++++++++++++++ will need to add tectonic plates -- data can be found at https://github.com/fraxen/tectonicplates
@@ -139,7 +140,7 @@ function createMap(earthquakes) {
     .layers(baseMaps, overlayMaps, {
       collapsed: false,
     }).addTo(myMap);
-
+   
 
   // Add legend to map using leaflet documentation
     let legend = L.control({position: 'bottomleft'});
