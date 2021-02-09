@@ -131,7 +131,7 @@ function createMap(earthquakes) {
   let myMap = L.map("map", {
     center: [37.09, -95.71],
     zoom: 5,
-    layers: [satellite, earthquakes, faultLineLayer],
+    layers: [darkmap, earthquakes, faultLineLayer],
   });
   // Create a layer control
   // Pass in our baseMaps and overlayMaps
